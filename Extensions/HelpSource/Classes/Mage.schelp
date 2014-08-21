@@ -1,0 +1,173 @@
+TITLE:: Mage
+summary:: Mage speech synthesizer plug-in.
+categories:: UGens>Unclassified
+
+DESCRIPTION::
+This class implement a SuperCollider interface of the Mage speech synthesizer.
+The synthesized speech outputs from a UGen and can be used like any classic UGen.
+
+To synthesize speech, Mage UGen must be fed with labels, which roughly correspond to context phoneme.
+The label syntax is the HTS format (as Mage is a modified version of HTS engine).
+
+See link::Guides/MageGuide:: for more details on how to use Mage.
+
+CLASSMETHODS::
+
+METHOD:: ar
+Generates audio samples of the currently synthesizing speech.
+
+Audio samples are generated only when the Synth has a voice and is fed with labels.
+
+ARGUMENT:: pitch
+shift the speaker's pitch. 1.0 is the natural pitch.
+
+ARGUMENT:: speed
+change the speaker's speed. 1.0 is the standard speed.
+
+ARGUMENT:: alpha
+it's indicate the size of the speaker's mouth. 1.0 is the standard value.
+
+ARGUMENT:: mul
+control volume.
+
+returns::
+A Mage UGen.
+
+METHOD:: new
+same as ar method.
+
+METHOD:: pushLab
+push a string label to the Mage synthesizer at the end of label's queue to be synthesized.
+
+ARGUMENT:: server
+the server running the Mage synthesizer.
+
+ARGUMENT:: synth
+the Synth containing the Mage UGen in use.
+
+ARGUMENT:: label
+the label as string.
+
+METHOD:: addVoice
+set the predefined voice of the speaker. Multiple predefined voice can be added to create a custom voice by interpolation. When multiple predefined voice are added, use setWeight method to design your personalized voice.
+
+ARGUMENT:: server
+the server running the Mage synthesizer.
+
+ARGUMENT:: synth
+the Synth containing the Mage UGen in use.
+
+ARGUMENT:: name
+the voice's name tag as string. Can be anything, only used to recognize the voice when using setWeight method.
+
+ARGUMENT:: path
+the file's path containing the predefined parameters of the speaker to use.
+
+METHOD:: loadLabFile
+open a file containing one label per line and push labels to the Mage synthesizer to be synthesized.
+
+ARGUMENT:: server
+the server running the Mage synthesizer.
+
+ARGUMENT:: synth
+the Synth containing the Mage UGen in use.
+
+ARGUMENT:: path
+the file's path containing labels.
+
+METHOD:: reloadLabs
+Re-synthesize all the labels previously pushed into the Mage synthesizer.
+
+ARGUMENT:: server
+the server running the Mage synthesizer.
+
+ARGUMENT:: synth
+the Synth containing the Mage UGen in use.
+
+ARGUMENT:: times
+number of times to reload all the previous labels.
+
+METHOD:: listenOSC
+Listen the incoming OSC packets on a specific port to control Mage synthesizer. Each Synth of Mage must have its own port to be able to dispatch correctly OSC packets.
+
+Here is the different OSC packets implemented :
+list::
+## [ '/label' , integer size, args... ] : push new labels to Mage synthesizer. Integer size argument indicates the number of labels that are present in the OSC packet. args... are the labels as string.
+
+## [ '/probe' , 'p' , float value ] : shift the speaker's pitch by the indicated value.
+
+## [ '/probe' , 's' , float value ] : change the speaker's speed to the indicated value.
+
+## [ '/probe' , 'a' , float value ] : change the speaker's mouth to the indicated value.
+::
+ARGUMENT:: server
+the server running the Mage synthesizer.
+
+ARGUMENT:: synth
+the Synth containing the Mage UGen in use.
+
+ARGUMENT:: port
+the receiving port to listen. By default, it's set to 9700.
+
+METHOD:: dictionary
+Load a dictionary file which contains, for each word, the corresponding phonemes.
+The call of this method is required if you want to use the speak method.
+
+ARGUMENT:: server
+the server running the Mage synthesizer.
+
+ARGUMENT:: synth
+the Synth containing the Mage UGen in use.
+
+ARGUMENT:: path
+the file's path containing the dictionary.
+
+METHOD:: speak
+Tell to your Mage synthesizer to speak the sentence. Words are transcripted into labels thanks to a dictionary before the latters are sent into your synthesizer.
+
+Call dictionary method before if you want to use this method.
+
+ARGUMENT:: server
+the server running the Mage synthesizer.
+
+ARGUMENT:: synth
+the Synth containing the Mage UGen in use.
+
+ARGUMENT:: sentence
+the sentence as string. Currently, only final dot punctuation is supported.
+
+METHOD:: setWeight
+Modify the interpolation weight of the given voice. This is useful when you add more than one predefined voice into Mage to create a custom voice.
+
+note::
+Be sure to have the weight's sum of all the voice equal to 1. Otherwise, it could sound horribly.  
+::
+
+ARGUMENT:: server
+the server running the Mage synthesizer.
+
+ARGUMENT:: synth
+the Synth containing the Mage UGen in use.
+
+ARGUMENT:: name
+the voice's name.
+
+ARGUMENT:: weight
+the new weight of this voice.
+
+
+INSTANCEMETHODS::
+
+
+EXAMPLES::
+See link::Guides/MageGuide:: for more details on how to use Mage.
+
+section:: Credits
+
+Created by Antonin Puleo.
+ 
+From University of Mons :
+         
+Numediart Institute for New Media Art ( www.numediart.org )
+
+Last update : 13/05/2014

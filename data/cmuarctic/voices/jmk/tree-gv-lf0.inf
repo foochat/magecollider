@@ -1,0 +1,13 @@
+QS Num-Syls_in_Utterance==6 { "*/J:6+*" }
+QS Num-Syls_in_Utterance<=7 { "*/J:1+*","*/J:2+*","*/J:3+*","*/J:4+*","*/J:5+*","*/J:6+*","*/J:7+*" }
+QS Num-Syls_in_Utterance<=16 { "*/J:?+*","*/J:10+*","*/J:11+*","*/J:12+*","*/J:13+*","*/J:14+*","*/J:15+*","*/J:16+*" }
+QS Num-Phrases_in_Utterance==1 { "*-1" }
+
+{*}[2]
+{
+   0 Num-Syls_in_Utterance<=7                           -2         -1    
+  -1 Num-Phrases_in_Utterance==1                        -3          "gv_lf0_1" 
+  -2 Num-Syls_in_Utterance<=16                           "gv_lf0_3"       "gv_lf0_2" 
+  -3 Num-Syls_in_Utterance==6                            "gv_lf0_5"       "gv_lf0_4" 
+}
+

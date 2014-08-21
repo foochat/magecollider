@@ -1,0 +1,225 @@
+TITLE:: Mage Guide
+summary:: Shows how to use Mage plug-in.
+categories:: UGens>Unclassified
+
+You can run all the lines from the top to bottom.
+
+section:: Initialisation Step
+First, boot local server.
+code::
+s.boot;
+::
+The link::Classes/Mage:: UGen needs to be explicitly described in a link::Classes/SynthDef:: to be able to manipulate it later.
+code::
+(
+// Create a SynthDef that uses Mage UGen.
+SynthDef(\mage, {arg outbus = 0, pitch = 1.0, speed = 1.0, alpha = 1.0, mul = 1.0;
+	Out.ar(outbus, Mage.ar(pitch, speed, alpha, mul));
+}).add;
+
+// For fun, create a SynthDef that add a delay effect to the Mage speaker.
+SynthDef(\delay, { arg inbus = 0, outbus = 1, delay = 0.15;
+    Out.ar(outbus, DelayN.ar(In.ar(inbus), delay, delay));
+}).add;
+)
+::
+
+section:: Instantiation Step
+Instanciate Mage speaker by creating a link::Classes/Synth:: of the previously defined link::Classes/SynthDef::.
+code::
+// Instanciate Mage engine.
+x = Synth.new(\mage);
+
+// Add it the delay effect if you want.
+y = Synth.after(x, \delay);
+::
+At this time, Mage is running but no audio sample is generated yet as our speaker has no voice and nothing to say.
+
+It is really important to save the Mage Synth into a variable (in the example, variable code::x::).
+This is thanks to this variable that we later can tell to Mage what is its voice or, more important, what Mage has to say ! 
+Of course, it's also useful in order to create multiple Mage instance and to control them separately. 
+
+subsection:: Define predefined speaker's voice
+Mage can use different predefined speaker's voice. For example, MAGE adapted cmuarctic voices can be loaded, like : slt, awb, bdl, clb, jmk and rms voices. They are included in the Mage Plug-In Package.
+code::
+// Add a predefined voice for your speaker.
+Mage.addVoice(s, x, "slt", "/usr/data/cmuarctic/voices/slt"); // slt, awb, bdl, clb, jmk, rms
+::
+note::
+Be sure to have all configurations' voice files in the same folder ! For example, in the slt folder we have the following list :
+list::
+## args.conf
+## dur.pdf
+## gv-lf0.pdf
+## gv-mgc.pdf
+## gv-switch.inf
+## lf0.pdf
+## lf0.win1
+## lf0.win2
+## lf0.win3
+## lpf.pdf
+## lpf.win1
+## mgc.pdf
+## mgc.win1
+## mgc.win2
+## mgc.win3
+## tree-dur.inf
+## tree-gv-lf0.inf
+## tree-gv-mgc.inf
+## tree-lf0.inf
+## tree-lpf.inf
+## tree-mgc.inf
+::
+::
+subsection:: Voice customisation
+Mage is able to interpolate between some predefined voices and so, you can create a personalized voice.
+
+In practice, add other predefined voices to your Synth ...
+code::
+Mage.addVoice(s, x, "awb", "/usr/data/cmuarctic/voices/awb");
+Mage.addVoice(s, x, "rms", "/usr/data/cmuarctic/voices/rms");
+::
+... and interpolate between them to create a unique custom voice :
+code::
+Mage.setWeight(s, x, "rms", 0.3);
+Mage.setWeight(s, x, "slt", 0.3);
+Mage.setWeight(s, x, "awb", 0.4); 
+::
+Each voice has a weight between 0 and 1. Manage to get sum of the weights equal to 1. Otherwise, it could sound horribly.
+note::
+Each time you add a new voice, this one has a weight set to 1 and others are reset to 0.
+::
+
+
+section:: Playing Step
+Now that your speaker have a voice, how can we tell him what he have to say ?
+
+The link::Classes/Mage:: UGen implements different ways to do it.
+
+subsection:: Pushing labels
+The speech synthesizer implemented under the link::Classes/Mage:: UGen is based on the well-known HTS engine that uses labels to feed the synthesizer. A Label roughly corresponds to a syllable + context and can be used to feed link::Classes/Mage:: UGen.
+
+To push a new label to your Mage synthesizer, just write it as a string.
+Here, 4 labels are sent in a row (beginning of the word "Alice") :
+code::
+(
+Mage.pushLab(s, x, "x^x-pau+ae=l@x_x/A:0_0_0/B:x-x-x@x-x&x-x#x-x$x-x!x-x;x-x|x/C:1+1+2/D:0_0/E:x+x@x+x&x+x#x+x/F:content_2/G:0_0/H:x=x^1=10|0/I:19=12/J:79+57-10");
+Mage.pushLab(s, x, "x^pau-ae+l=ax@1_2/A:0_0_0/B:1-1-2@1-2&1-19#1-10$1-5!0-2;0-8|ae/C:0+0+2/D:0_0/E:content+2@1+12&1+6#0+2/F:aux_1/G:0_0/H:19=12^1=10|L-H%/I:3=3/J:79+57-10");
+Mage.pushLab(s, x, "pau^ae-l+ax=s@2_1/A:0_0_0/B:1-1-2@1-2&1-19#1-10$1-5!0-2;0-8|ae/C:0+0+2/D:0_0/E:content+2@1+12&1+6#0+2/F:aux_1/G:0_0/H:19=12^1=10|L-H%/I:3=3/J:79+57-10");
+Mage.pushLab(s, x, "ae^l-ax+s=w@1_2/A:1_1_2/B:0-0-2@2-1&2-18#1-10$1-5!1-1;1-7|ax/C:1+0+3/D:0_0/E:content+2@1+12&1+6#0+2/F:aux_1/G:0_0/H:19=12^1=10|L-H%/I:3=3/J:79+57-10");
+)
+::
+Each label is added at the end of a queue while the synthesizer is synthesizing the sound corresponding to the label at the front of the queue.
+
+A file containing labels can also be used :
+code::
+Mage.loadLabFile(s, x, "/usr/data/cmuarctic/labels/alice01.lab");
+::
+The file must contain only one label per line.
+
+Finally, you can re-push all previously inserted labels at the end of the queue to re-synthesize them.
+code::
+Mage.reloadLabs(s, x, 2); // all labels re-pushed 2 times.
+::
+
+subsection:: Listen to OSC
+The possibility to receive labels by OSC protocol is already implemented in the link::Classes/Mage:: Class :
+code::
+Mage.listenOSC(s, x, 9700);
+::
+It pushes to Mage synthesizer all the labels contained in OSC packets received on UDP port 9700 and with the address '/label'.
+
+Of course, the OSC listening can be done directly in your script. For example :
+code::
+thisProcess.openUDPPort(9700); // attempt to open port
+f = { |msg, time, replyAddr, recvPort|
+	if( recvPort == 9700 ) {
+		if( msg[0] == '/label' ) {
+			for (2, msg[1]+1, { arg i;
+				Mage.pushLab(s, x, msg[i]);
+			});
+		};
+	}
+};
+thisProcess.addOSCRecvFunc(f);
+::
+
+Please note that the listenOSC method also responds to '/probe' packets with the following arguments :
+list::
+## [ '/probe' , 'p' , value ] : acts as x.set(\pitch, value);
+## [ '/probe' , 's' , value ] : acts as x.set(\speed, value);
+## [ '/probe' , 'a' , value ] : acts as x.set(\alpha, value);
+::
+This is used to control Mage parameters in real-time (see sub-section Control Mage Parameters).
+
+The listenOSC method was firstly designed to control Mage by Rasmus Dall's text-to-label on-the-fly transcriptor. It gives an interface to write words and, each time spacebar is pressed, it translates the word into labels and sends them by OSC.
+There is also the ability to send OSC '/probe' packets when you type something between parentheses. 
+
+See Rasmus Dall work for more details.
+
+subsection:: Text-to-label transcriptor
+A lite implementation of the Rasmus Dall's text-to-label generator is also available in the link::Classes/Mage:: UGen. Currently, only final dot punctuation is supported.
+
+This generator needs a dictionary to recognize words. So let's load one ...
+code::
+Mage.dictionary(s, x, "/usr/data/cmuarctic/dictionary/cmudict.txt");
+::
+... and say what you want !
+code::
+Mage.speak(s, x, "Alice was beginning to get very tired.");
+::
+
+subsection:: Control Mage Parameters
+Some speaker's parameters can be modified in real time.
+
+You can change the pitch to have a high voice :
+code::
+x.set(\pitch, 1.2); // 1.2 x natural pitch
+::
+
+Or change the speaking's speed :
+code::
+x.set(\speed, 0.5); // 0.5 x normal speed
+::
+
+Or maybe your speaker suddenly became very big ?
+code::
+x.set(\alpha, 1.3); // big mouth ! by default : alpha = 1.0
+::
+
+Less fun, reduce the volume :
+code::
+x.set(\mul, 0.5); // volume decreased
+::
+
+Well, stop talking about Alice...
+code::
+x.run(false); // pause mage
+::
+... or not ?
+code::
+x.run(true);  // resume mage
+::
+And without delay ?
+code::
+y.run(false); // pause delay
+::
+Not bad... but I like it on !
+code::
+y.run(true);  // resume delay
+::
+
+Okey... It's time to leave...
+code::
+x.free; y.free; // free memory.
+::
+
+section:: Credits
+
+Created by Antonin Puleo.
+ 
+From University of Mons :
+         
+Numediart Institute for New Media Art ( www.numediart.org )
+
+Last update : 10/08/2014

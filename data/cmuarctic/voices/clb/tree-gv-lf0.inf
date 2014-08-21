@@ -1,0 +1,9 @@
+QS Num-Syls_in_Utterance<=8 { "*/J:1+*","*/J:2+*","*/J:3+*","*/J:4+*","*/J:5+*","*/J:6+*","*/J:7+*","*/J:8+*" }
+QS Num-Syls_in_Utterance<=15 { "*/J:?+*","*/J:10+*","*/J:11+*","*/J:12+*","*/J:13+*","*/J:14+*","*/J:15+*" }
+
+{*}[2]
+{
+   0 Num-Syls_in_Utterance<=8                           -1          "gv_lf0_1" 
+  -1 Num-Syls_in_Utterance<=15                           "gv_lf0_3"       "gv_lf0_2" 
+}
+
