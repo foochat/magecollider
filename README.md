@@ -12,10 +12,9 @@ Last Update :	10-August-2014
 
 INSTALL
 =======
-
- Linux (Ubuntu)
----------------
-
+-----------------
+ Linux (Ubuntu) :
+-----------------
 1.	Copy all the content of "Extensions" folder into your extension directory of SuperCollider.
 	It should be :
 	~/share/SuperCollider/Extensions/
@@ -30,11 +29,11 @@ INSTALL
 
 4.	Open MageExample.scd (located in Examples folder) with SuperCollider to test the plug-in.
 
-5.	Have fun !
+5.	Have fun.
 
-
- MAC OSX
---------
+----------
+ MAC OSX :
+----------
 TODO: compile it on OSX.
 
 The steps are the same as for Linux but the extension directory of SuperCollider is slightly different, so check the Post window.
