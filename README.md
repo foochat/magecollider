@@ -1,6 +1,6 @@
-/----------------------------------------------------/
-                  GENERALITIES
-/----------------------------------------------------/
+
+GENERALITIES
+============
 
 This is a Mage plug-in for SuperCollider.
 
@@ -10,12 +10,11 @@ Author :	Antonin Puleo - 2014
 
 Last Update :	10-August-2014
 
-/----------------------------------------------------/
-                     INSTALL
-/----------------------------------------------------/
+INSTALL
+=======
 
  Linux (Ubuntu) :
---------
+-----------------
 
 1.	Copy all the content of "Extensions" folder into your extension directory of SuperCollider.
 	It should be :
